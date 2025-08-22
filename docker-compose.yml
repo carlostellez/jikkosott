@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=INFO
+    depends_on:
+      - redis
+    networks:
+      - food-delivery
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - food-delivery
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: food_delivery
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - food-delivery
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  food-delivery:
+    driver: bridge
